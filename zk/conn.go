@@ -941,13 +941,26 @@ func (c *Conn) nextXid() int32 {
 	return int32(atomic.AddUint32(&c.xid, 1) & 0x7fffffff)
 }
 
+func init() {
+	go func() {
+		for {
+			fmt.Println("YZC init")
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+}
+
 func (c *Conn) addWatcher(path string, watchType watchType) <-chan Event {
 	c.watchersLock.Lock()
 	defer c.watchersLock.Unlock()
-
+	fmt.Println("YZC addWatcher path", path)
 	ch := make(chan Event, 1)
 	wpt := watchPathType{path, watchType}
+	fmt.Println("YZC addWatcher wpt", wpt)
 	c.watchers[wpt] = append(c.watchers[wpt], ch)
+	fmt.Println("YZC addWatcher wpt len", len(c.watchers[wpt]))
+	fmt.Println("YZC addWatcher size", len(c.watchers))
 	return ch
 }
 
